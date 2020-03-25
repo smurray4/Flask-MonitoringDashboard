@@ -5,8 +5,8 @@ except ImportError:
 
 import os
 
-import pytz
-from tzlocal import get_localzone
+from pytz import timezone
+# from tzlocal import get_localzone
 
 from flask_monitoringdashboard.core.config.parser import (
     parse_string,
@@ -48,11 +48,12 @@ class Config(object):
 
         # visualization
         self.colors = {}
-        try:
-            self.timezone = pytz.timezone(str(get_localzone()))
-        except pytz.UnknownTimeZoneError:
-            log('Using default timezone, which is UTC')
-            self.timezone = pytz.timezone('UTC')
+        self.timezone = timezone('UTC')
+        # try:
+        #     self.timezone = pytz.timezone(str(get_localzone()))
+        # except pytz.UnknownTimeZoneError:
+        #     log('Using default timezone, which is UTC')
+        #     self.timezone = pytz.timezone('UTC')
 
         # define a custom function to retrieve the session_id or username
         self.group_by = None
@@ -159,7 +160,7 @@ class Config(object):
 
             # visualization
             self.colors = parse_literal(parser, 'visualization', 'COLORS', self.colors)
-            self.timezone = pytz.timezone(
+            self.timezone = timezone(
                 parse_string(parser, 'visualization', 'TIMEZONE', self.timezone.zone)
             )
 

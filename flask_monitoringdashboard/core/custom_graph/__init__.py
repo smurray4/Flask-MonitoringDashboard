@@ -3,6 +3,8 @@ import os
 
 from apscheduler.schedulers import SchedulerAlreadyRunningError
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.util import asbool
+from pytz import timezone
 
 from flask_monitoringdashboard.database import session_scope
 from flask_monitoringdashboard.database.custom_graph import (
@@ -11,7 +13,15 @@ from flask_monitoringdashboard.database.custom_graph import (
     get_graphs,
 )
 
-scheduler = BackgroundScheduler()
+class CustomBackgroundScheduler(BackgroundScheduler):
+
+    def _configure(self, config):
+        self._daemon = asbool(config.pop('daemon', True))
+        config['timezone'] = timezone('UTC')
+        super(BackgroundScheduler, self)._configure(config)
+
+
+scheduler = CustomBackgroundScheduler()
 
 
 def init(app):
